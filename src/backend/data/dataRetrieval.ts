@@ -49,3 +49,46 @@ const getAllTitles = async (url : string) => {
 // }
 
 // printPages();
+
+let parse_url : string = baseURL;
+const parse_params : Record<string, string> = {
+    action: "parse",
+    format: "json",
+    prop: "text"
+}
+
+Object.keys(parse_params).forEach((key : string) : void => {
+    parse_url += `&${key}=${parse_params[key]}`
+})
+
+let contentArray : Array<Record<string, string>> = [];
+
+const getAllArticles = async () => {
+    await getAllTitles(getpages_url);
+
+    for (let p in pagesArray) {
+        const title = pagesArray[p].title;
+        const new_url = parse_url + `&page=${title}`;
+        console.log(new_url);
+
+        const req = await fetch(new_url);
+        const json = await req.json();
+        // console.log(json);
+        const content = json.parse.text["*"];
+
+        contentArray.push({title: title, content: content});
+    }
+
+    return contentArray;
+}
+
+// const printArticles = async() => {
+//     await getAllArticles();
+//     for (let a in contentArray) {
+//         console.log(contentArray[a]);
+//     }
+// }
+//
+// printArticles();
+
+export default getAllArticles;
