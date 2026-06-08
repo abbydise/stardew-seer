@@ -40,12 +40,12 @@ const getAllPages = async (url : string) => {
     }
 }
 
-const printPages = async () => {
-    await getAllPages(getpages_url);
+// const printPages = async () => {
+//     await getAllPages(getpages_url);
+//
+//     for (let p in pagesArray) {
+//         console.log(pagesArray[p].title);
+//     }
+// }
 
-    for (let p in pagesArray) {
-        console.log(pagesArray[p].title);
-    }
-}
-
-printPages();
+// printPages();
