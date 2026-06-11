@@ -109,48 +109,168 @@ const getAllArticles = async () => {
 //
 // printArticles();
 
-const parseContentHTML = (article : Record<string, string>) => {
+const parseContentHTML = (article : Record<string, string>) : Array<Record<string, string>> => {
     const $ = cheerio.load(article.content);
+    const formattedContent : Array<Record<string, string>> = [];
 
     $("#navbox").remove()
     $("#toc").remove();
+    $("#gallery").remove();
+
+    const infobox = $("#infoboxtable");
+    if (infobox.length > 0) {
+        // console.log("Found infobox");
+        const infoboxArray = parseInfoboxData($, infobox.get(0) as Element);
+        formattedContent.push({articleTitle: article.title, sectionTitle: "infobox", content: infoboxArray.join("\n")})
+    }
 
     const sections = $('h2');
     // console.log(sections);
 
     sections.each((i, section) => {
-        const textArray : string[] = []
+        const skippableSections : string[] = ["Crop Growth Calendar", "Stages", "Quotes", "Questions", "Timeline", "Schedule"]
+        const textArray : string[] = [];
+        let listArray : string[] = [];
         let tableArray : string[] = [];
-        const sectionTitle : string = $(section).text().trim();
-        if (!sectionTitle.includes("Calendar") && !sectionTitle.includes("Stage") && !sectionTitle.includes("Quotes")) {
-            // console.log($(section).text().trim());
+        let contentString : string = "";
+
+        const sectionTitle : string = $(section).text().trim().replace("[edit]", "");
+        // console.log(sectionTitle);
+        if (!skippableSections.includes(sectionTitle)) {
             const content = $(section).nextUntil('h2');
             content.each((i, element) => {
                 if (!("tagName" in element)) return;
                 const tag: string = element.tagName.toLowerCase();
                 if (tag == "p") {
+                    $(element).find("img").remove();
+                    $(element).find("style").remove();
+                    $(element).find("[style*='display: none']").remove();
                     textArray.push($(element).text().trim());
                 } else if (tag == "ul") {
-                    parseListData($, element);
-                } else if ($(element).attr("id") == "infoboxtable") {
-
+                    // console.log("Found list");
+                    listArray = parseListData($, element);
                 } else {
-                    if ($(element).attr("class") != "squote") {
-                        tableArray = parseTableData($, element);
+                    const tableHeaderId = $(element).find("th").attr("id");
+                    const tableStyle = $(element).attr("style");
+
+                    if (tableStyle && tableStyle.includes("border-collapse")) {
+                        return;
+                    } else if (tableHeaderId && tableHeaderId.includes("Bundle")) {
+                        // console.log("Found bundle table");
+                        tableArray.push(parseBundleTable($, element));
+                    } else if ($(element).attr("class") != "squote") {
+                        // console.log("Found table");
+                        tableArray.push(...parseTableData($, element));
                     }
                 }
             })
-            // console.log(textArray.join(" "));
-
-            if (tableArray.length != 0) {
-                console.log(tableArray.join("\n"));
+            if (textArray.length > 0) {
+                contentString += textArray.join("\n");
             }
+
+            if (listArray.length > 0) {
+                contentString += listArray.join("\n");
+            }
+
+            if (tableArray.length > 0) {
+                contentString += tableArray.join("\n");
+            }
+
+            formattedContent.push({articleTitle: article.title, sectionTitle: sectionTitle, content: contentString});
         }
     })
+
+    return formattedContent;
 }
 
-const parseListData = ($ : CheerioAPI, element : Element) => {
+const parseListData = ($ : CheerioAPI, element : Element) : string[] => {
+    const listArray : string[] = [];
 
+    const listItems = $(element).children("li");
+    if (listItems.length > 0) {
+        listItems.each((i, item) => {
+            $(item).find("img").remove();
+            $(item).find("style").remove();
+            $(item).find("[style*='display: none']").remove();
+
+            const textContent = $(item).text().trim();
+            if (textContent.length > 0) {
+                listArray.push(textContent);
+            }
+        })
+    }
+
+    return listArray;
+}
+
+const parseInfoboxData = ($ : CheerioAPI, element : Element) : string[] => {
+    const infoboxArray : string[] = [];
+
+    const infoboxRows = $(element).children("tbody").children("tr");
+
+    if (infoboxRows.length > 0) {
+        infoboxRows.each((i, row) => {
+            const nestedTable = $(row).children("td").children("table");
+            if ($(row).find('[colspan="2"]').length == 0 && nestedTable.length == 0) {
+                $(row).find("img").remove();
+                $(row).find("style").remove();
+                $(row).find("[style*='display: none']").remove();
+
+                const key = $(row).children("td").first().text().trim();
+                const value = $(row).children("td").eq(1).text().trim();
+
+                if (key.length > 0 && value.length > 0) {
+                    infoboxArray.push(`${key}: ${value}`);
+                }
+            } else if (nestedTable.length > 0 && $(nestedTable).find('img[alt*="Energy"]').length > 0) {
+                const nestedTableRows = $(nestedTable).children("tbody").children("tr");
+                if (nestedTableRows.length > 0) {
+                    nestedTableRows.each((j, row) => {
+                        $(row).find("img").remove();
+                        $(row).find("style").remove();
+                        $(row).find("[style*='display: none']").remove();
+
+                        const quality = ["Base", "Silver", "Gold", "Iridium"];
+
+                        const energy = $(row).children("td").eq(1).text().trim();
+                        const health = $(row).children("td").eq(3).text().trim();
+
+                        // console.log(`${energy} / ${health}`);
+
+                        if (energy.length > 0 && health.length > 0) {
+                            const textContent = `${quality[j]}: ${energy} energy / ${health} health`;
+
+                            infoboxArray.push(textContent);
+                        }
+                    })
+                }
+            }
+        })
+    }
+
+    return infoboxArray;
+}
+
+const parseBundleTable = ($ : CheerioAPI, element : Element) : string => {
+    const header = $(element).find("th").first();
+    const bundleTitle = header.text().trim();
+
+    const rows = $(element).children("tbody").children("tr");
+    const itemsAndSources : string[] = [];
+    if (rows.length > 0) {
+        rows.each((i, row) => {
+            if ($(row).children("td").length >= 2) {
+                $(row).find("img").remove();
+                $(row).find("style").remove();
+                $(row).find("[style*='display: none']").remove();
+                const itemName = $(row).children("td").eq(-2).text().trim();
+                const source = $(row).children("td").last().text().trim();
+
+                itemsAndSources.push(`${itemName} (${source})`)
+            }
+        })
+    }
+    return `${bundleTitle}: ${itemsAndSources.join(", ")}`
 }
 
 const parseTableData = ($ : CheerioAPI, element : Element) : string[] => {
@@ -174,7 +294,7 @@ const parseTableData = ($ : CheerioAPI, element : Element) : string[] => {
     const separatorString = "| " + separatorArray.join(" | ") + " |";
     tableArray.push(separatorString);
 
-    const rows = $(element).find("tbody > tr");
+    const rows = $(element).children("tbody").children("tr");
     rows.each((i, row) => {
         const tableDataArray: string[] = [];
         if ($(row).children("td").length == 0) {
@@ -190,14 +310,50 @@ const parseTableData = ($ : CheerioAPI, element : Element) : string[] => {
 
         const data = $(row).children("td");
         data.each((i, value) => {
+            const nestedTable = $(value).children("table");
             const breaks = $(value).find("br");
-            if (breaks.length != 0) {
-                let htmlString = $(value).html();
-                if (htmlString) {
-                    htmlString = htmlString.replaceAll("<br>", "/")
-                    const $cleanedString = cheerio.load(htmlString);
 
-                    const text = $cleanedString().text().trim();
+            if (nestedTable.length != 0 && $(nestedTable).find('img[alt*="Quality Icon"]').length > 0) {
+                nestedTable.each((i, nestedTables) => {
+                    const nestedTableDataArray : string[] = []
+                    const nestedTableRows = $(nestedTables).children("tbody").children("tr");
+                    nestedTableRows.each((row, nestedRows) => {
+                        const nestedTableData = $(nestedRows).children("td");
+                        nestedTableData.each((i, nestedData) => {
+                            const quality = ["Base", "Silver", "Gold", "Iridium"];
+                            $(nestedData).find("img").remove();
+                            $(nestedData).find("style").remove();
+                            $(nestedData).find("[style*='display: none']").remove();
+
+                            const cellText = $(nestedData).text().trim()
+                            if (cellText.length > 0) {
+                                const textContent = `${quality[row]}: ${cellText}`;
+                                // console.log(textContent);
+                                nestedTableDataArray.push(textContent);
+                            }
+                        })
+                    })
+
+                    if (nestedTableDataArray.length > 0) {
+                        // console.log(nestedTableDataArray);
+
+                        const nestedTableString = nestedTableDataArray.join(", ");
+                        // console.log(nestedTableString);
+
+                        tableDataArray.push(nestedTableString);
+                    }
+
+                })
+            } else if (breaks.length != 0) {
+                let htmlString = $(value).html();
+                // console.log(htmlString);
+                if (htmlString) {
+                    htmlString = htmlString.replaceAll("<br>", " / ")
+                    // console.log(htmlString);
+                    const $cleanedString = cheerio.load(htmlString);
+                    const text = $cleanedString.text().trim();
+                    // console.log(text);
+
                     if (text.length > 0) {
                         tableDataArray.push(text);
                     }
@@ -229,9 +385,8 @@ const testHTMLParser = async () => {
     //     // console.log(article.title);
     //     parseContentHTML(article);
     // }
-    parseContentHTML(articleArray[6]);
+    console.log(parseContentHTML(articleArray[0]));
 }
-
 testHTMLParser();
 
 export default { getAllArticles, parseContentHTML };
