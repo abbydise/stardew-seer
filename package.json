@@ -6,7 +6,12 @@
   "scripts": {
     "build": "tsc"
   },
-  "dependencies": {},
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cheerio": "^1.1.0",
+    "postgres": "^3.4.9",
+    "supabase": "^2.106.0"
+  },
   "devDependencies": {
     "typescript": "^5.5.3"
   },
