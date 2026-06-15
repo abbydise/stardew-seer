@@ -70,24 +70,10 @@ let articleArray : Array<Record<string, string>> = [];
 const getAllArticles = async () => {
     await getAllTitles(getpages_url);
 
-    // for (let p of pagesArray) {
-    //     const title = p.title;
-    //     const new_url = parse_url + `&page=${title}`;
-    //     console.log(new_url);
-    //
-    //     const req = await fetch(new_url);
-    //     const json = await req.json();
-    //     // console.log(json);
-    //     const content = json.parse.text["*"];
-    //
-    //     articleArray.push({title: title, content: content});
-    // }
-
-    const testPages : string[] = ["Parsnip", "Alex", "Community Center", "Blacksmith", "The Desert", "Spring", "Chicken", "Pickaxes", "Energy", "Fishing", "Secret Notes", "Luck", "Diamond", "Friendship", "Bundles"]
-    for (let i of testPages) {
-        const title = i;
-        const new_url = parse_url + `&page=${i}`;
-        // console.log(new_url);
+    for (let p of pagesArray) {
+        const title = p.title;
+        const new_url = parse_url + `&page=${title}`;
+        console.log(new_url);
 
         const req = await fetch(new_url);
         const json = await req.json();
@@ -96,6 +82,20 @@ const getAllArticles = async () => {
 
         articleArray.push({title: title, content: content});
     }
+
+    // const testPages : string[] = ["Parsnip", "Alex", "Community Center", "Blacksmith", "The Desert", "Spring", "Chicken", "Pickaxes", "Energy", "Fishing", "Secret Notes", "Luck", "Diamond", "Friendship", "Bundles"]
+    // for (let i of testPages) {
+    //     const title = i;
+    //     const new_url = parse_url + `&page=${i}`;
+    //     // console.log(new_url);
+    //
+    //     const req = await fetch(new_url);
+    //     const json = await req.json();
+    //     // console.log(json);
+    //     const content = json.parse.text["*"];
+    //
+    //     articleArray.push({title: title, content: content});
+    // }
 
     return articleArray;
 }
@@ -128,7 +128,7 @@ const parseContentHTML = (article : Record<string, string>) : Array<Record<strin
     // console.log(sections);
 
     sections.each((i, section) => {
-        const skippableSections : string[] = ["Crop Growth Calendar", "Stages", "Quotes", "Questions", "Timeline", "Schedule"]
+        const skippableSections : string[] = ["Crop Growth Calendar", "Stages", "Quotes", "Questions", "Timeline", "Schedule", "Portraits", "Gallery", "External Links", "References", "Energy Cost", "Remixed Bundles"]
         const textArray : string[] = [];
         let listArray : string[] = [];
         let tableArray : string[] = [];
@@ -378,15 +378,15 @@ const parseTableData = ($ : CheerioAPI, element : Element) : string[] => {
     return tableArray;
 }
 
-const testHTMLParser = async () => {
-    await getAllArticles();
-
-    // for (let article of articleArray) {
-    //     // console.log(article.title);
-    //     parseContentHTML(article);
-    // }
-    console.log(parseContentHTML(articleArray[0]));
-}
-testHTMLParser();
+// const testHTMLParser = async () => {
+//     await getAllArticles();
+//
+//     // for (let article of articleArray) {
+//     //     // console.log(article.title);
+//     //     parseContentHTML(article);
+//     // }
+//     console.log(parseContentHTML(articleArray[14]));
+// }
+// testHTMLParser();
 
 export default { getAllArticles, parseContentHTML };
