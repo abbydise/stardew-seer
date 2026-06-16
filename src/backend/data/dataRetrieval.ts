@@ -78,10 +78,12 @@ const getAllArticles = async () => {
         const req = await fetch(new_url);
         const json = await req.json();
         // console.log(json);
-        if (json.parse.text != undefined) {
+        if (json.parse != undefined) {
             const content = json.parse.text["*"];
 
             articleArray.push({title: title, content: content});
+        } else {
+            console.log(`ERROR: ${title} is returning no content. Try again!`);
         }
     }
 
