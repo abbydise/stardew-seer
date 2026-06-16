@@ -389,4 +389,4 @@ const parseTableData = ($ : CheerioAPI, element : Element) : string[] => {
 // }
 // testHTMLParser();
 
-export default { getAllArticles, parseContentHTML };
+export { getAllArticles, parseContentHTML };
