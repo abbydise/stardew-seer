@@ -78,9 +78,11 @@ const getAllArticles = async () => {
         const req = await fetch(new_url);
         const json = await req.json();
         // console.log(json);
-        const content = json.parse.text["*"];
+        if (json.parse.text != undefined) {
+            const content = json.parse.text["*"];
 
-        articleArray.push({title: title, content: content});
+            articleArray.push({title: title, content: content});
+        }
     }
 
     // const testPages : string[] = ["Parsnip", "Alex", "Community Center", "Blacksmith", "The Desert", "Spring", "Chicken", "Pickaxes", "Energy", "Fishing", "Secret Notes", "Luck", "Diamond", "Friendship", "Bundles"]
@@ -99,7 +101,7 @@ const getAllArticles = async () => {
 
     return articleArray;
 }
-
+//
 // const printArticles = async() => {
 //     await getAllArticles();
 //     for (let a in articleArray) {
