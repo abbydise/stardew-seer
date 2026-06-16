@@ -73,7 +73,7 @@ const getAllArticles = async () => {
     for (let p of pagesArray) {
         const title = p.title;
         const new_url = parse_url + `&page=${title}`;
-        console.log(new_url);
+        // console.log(new_url);
 
         const req = await fetch(new_url);
         const json = await req.json();
@@ -101,6 +101,7 @@ const getAllArticles = async () => {
     //     articleArray.push({title: title, content: content});
     // }
 
+    console.log(`${articleArray.length} SUCCESSFUL RETRIEVALS`);
     return articleArray;
 }
 //
