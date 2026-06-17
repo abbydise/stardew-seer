@@ -39,7 +39,7 @@ const createChunks = async () => {
                     }
                 }
             }
-            console.log(`DEBUG: COMPLETED CHUNKING AND EMBEDDING FOR ${articleTitle}`);
+            console.log(`DEBUG: COMPLETED CHUNKING AND EMBEDDING FOR ${articleTitle.title}`);
         }
     } catch (e) {
         console.log(e);
