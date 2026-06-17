@@ -23,7 +23,7 @@ const createChunks = async () => {
 
     try {
         for (let articleTitle of articleTitles) {
-            console.log(`STARTING CHUNKING AND EMBEDDING FOR ${articleTitle}`)
+            console.log(`DEBUG: STARTING CHUNKING AND EMBEDDING FOR ${articleTitle}`)
             const articleContent: Array<Record<string, string>> = parseContentHTML(articleTitle);
 
             for (let content of articleContent) {
@@ -39,7 +39,7 @@ const createChunks = async () => {
                     }
                 }
             }
-            console.log(`COMPLETED CHUNKING AND EMBEDDING FOR ${articleTitle}`);
+            console.log(`DEBUG: COMPLETED CHUNKING AND EMBEDDING FOR ${articleTitle}`);
         }
     } catch (e) {
         console.log(e);

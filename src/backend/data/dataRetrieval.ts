@@ -75,6 +75,7 @@ const getAllArticles = async () => {
         const new_url = parse_url + `&page=${title}`;
         // console.log(new_url);
 
+        console.log(`DEBUG: RECEIVING ARTICLE CONTENT FOR ${title}`)
         const req = await fetch(new_url);
         const json = await req.json();
         // console.log(json);
