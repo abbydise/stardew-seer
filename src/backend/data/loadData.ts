@@ -8,7 +8,7 @@ import { getAllArticles, parseContentHTML } from "./dataRetrieval";
 type databaseEntry = {
     title : string,
     body : string,
-    embedding : number[]
+    embedding : string
 }
 
 const openai = new OpenAI();
@@ -32,7 +32,7 @@ const createChunks = async () => {
 
                 const chunks: string[] = await textSplitter.splitText(sectionContent);
                 for (let chunk of chunks) {
-                    const embeddingValue : number[] | undefined = await createEmbeddings(chunk);
+                    const embeddingValue : string | undefined = await createEmbeddings(chunk);
 
                     if (embeddingValue) {
                         embeddings.push({title: title, body: sectionContent, embedding: embeddingValue});
@@ -57,7 +57,7 @@ const createEmbeddings = async (chunk : string) => {
         });
         const embeddingValue: number[] = embedding.data[0].embedding;
 
-        return embeddingValue;
+        return `[${embeddingValue.join(',')}]`;
     } catch (e) {
         console.error(e);
     }
