@@ -65,14 +65,19 @@ const createEmbeddings = async (chunk : string) => {
 
 const loadIntoDatabase = async () => {
     const databaseEntries : databaseEntry[] = await createChunks()
+    const batchSize : number = 50;
 
     try {
-        await sql`
-            INSERT INTO documents ${
-                sql(databaseEntries, 'title', 'body', 'embedding')
-            }
-        `
-        console.log("SUCCESSFULLY UPLOADED TO THE DATABASE");
+        for (let i = 0; i < databaseEntries.length; i+= 50) {
+            const batch = databaseEntries.slice(i, i + 50);
+
+            await sql`
+                INSERT INTO documents ${
+                    sql(batch, 'title', 'body', 'embedding')
+                }
+            `
+        }
+        console.log("SUCCESSFULLY UPLOADED ALL OBJECTS TO THE DATABASE");
     } catch (e) {
         console.error(e);
     }
