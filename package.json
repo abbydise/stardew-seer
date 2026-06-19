@@ -4,11 +4,16 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "npm run embeddings && next build",
+    "seed": "npx tsx src/backend/data/loadData.ts",
+    "dev": "next dev",
+    "start": "next start",
+    "embeddings": "tsx src/backend/scripts/queryDatabase.ts"
   },
   "dependencies": {
     "@langchain/core": "^1.1.49",
     "@langchain/textsplitters": "^1.0.1",
+    "@supabase/supabase-js": "^2.108.2",
     "bcrypt": "^6.0.0",
     "cheerio": "^1.1.0",
     "dotenv": "^17.4.2",
