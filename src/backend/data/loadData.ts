@@ -11,7 +11,9 @@ type databaseEntry = {
     embedding : string
 }
 
-const openai = new OpenAI();
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+});
 const textSplitter = new RecursiveCharacterTextSplitter({
     chunkSize: 500,
     chunkOverlap: 100
@@ -48,7 +50,7 @@ const createChunks = async () => {
     return embeddings;
 }
 
-const createEmbeddings = async (chunk : string) => {
+export const createEmbeddings = async (chunk : string) => {
     try {
         const embedding = await openai.embeddings.create({
             model: "text-embedding-3-small",
