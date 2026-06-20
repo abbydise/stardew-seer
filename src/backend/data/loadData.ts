@@ -84,5 +84,3 @@ const loadIntoDatabase = async () => {
         console.error(e);
     }
 }
-
-loadIntoDatabase();
