@@ -8,7 +8,7 @@
     "seed": "npx tsx src/backend/data/loadData.ts",
     "dev": "next dev",
     "start": "next start",
-    "embeddings": "tsx src/backend/scripts/queryDatabase.ts"
+    "response": "tsx src/backend/scripts/createResponse.ts"
   },
   "dependencies": {
     "@langchain/core": "^1.1.49",
@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@types/node": "^25.9.3",
+    "@types/ws": "^8.18.1",
     "typescript": "^5.5.3"
   },
   "private": true
