@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "npm run embeddings && next build",
+    "build": "next build",
     "seed": "npx tsx src/backend/data/loadData.ts",
     "dev": "next dev",
     "start": "next start",
