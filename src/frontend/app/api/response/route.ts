@@ -58,8 +58,14 @@ const getResponse = async (userQuery: Record<string, string>) => {
         stream: false
     })
 
+    const answer = response.choices[0].message.content;
+
+    if (!answer) {
+        return {error: "Failed to generate a response.", status: 500}
+    }
+
     // console.log(response.choices[0].message.content);
-    return {answer: response.choices[0].message.content}
+    return {answer: answer}
 }
 
 export async function POST(request : NextRequest) {
@@ -69,8 +75,6 @@ export async function POST(request : NextRequest) {
 
         if (response.answer) {
             return NextResponse.json(response, {status: 200})
-        } else if (response.status == 400) {
-            return NextResponse.json({error: response.error}, {status: response.status})
         } else {
             return NextResponse.json({error: response.error}, {status: response.status})
         }
