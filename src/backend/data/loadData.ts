@@ -50,7 +50,7 @@ const createChunks = async () => {
     return embeddings;
 }
 
-export const createEmbeddings = async (chunk : string) => {
+const createEmbeddings = async (chunk : string) => {
     try {
         const embedding = await openai.embeddings.create({
             model: "text-embedding-3-small",
