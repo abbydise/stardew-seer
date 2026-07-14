@@ -51,7 +51,7 @@ const getResponse = async (userQuery: Record<string, string>) => {
         model: "gpt-5.4-mini",
         messages: [{
             role: "system",
-            content: 'You are a Stardew Valley expert. Given the following chunks of information from the official Wiki page, answer the question using only that information. It must be outputted as plain text. If you are unsure and the answer is not explicitly written in the documentation, say "Sorry, I am unable to answer that. Please consult the official Stardew Valley Wiki at https://stardewvalleywiki.com/Stardew_Valley_Wiki." Make sure the URL is in an HTML anchor tag.'
+            content: 'You are a Stardew Valley expert. Given the following chunks of information from the official Wiki page, answer the question using only that information. It must be outputted as plain text. If you are unsure and the answer is not explicitly written in the documentation, say "Sorry, I am unable to answer that. Please consult the official Stardew Valley Wiki at https://stardewvalleywiki.com/Stardew_Valley_Wiki."'
         }, {role: "user", content: `Context: ${data}\n\nQuestion: ${userQuery.question}`}],
         max_completion_tokens: 512,
         temperature: 0,
