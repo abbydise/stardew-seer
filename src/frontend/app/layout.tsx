@@ -36,7 +36,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${stardewChatFont.variable} ${stardewChatFont.variable} h-full antialiased`}
+      className={`${stardewChatFont.variable} ${stardewTitleFont.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

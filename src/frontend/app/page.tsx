@@ -1,9 +1,11 @@
+'use client'
+
 import Textbox from '../components/textbox';
 import Chatbox from '../components/chatbox';
 
 import { useState } from 'react';
 
-type Message = {
+export type Message = {
     origin: "user" | "system",
     content: string
 }
@@ -39,9 +41,10 @@ export default function Home() {
     }
 
   return (
-      <div>
+      <div className="ml-auto mr-auto">
         <h1>Home Page</h1>
-          <div><Textbox handleSubmit={handleSubmit}/></div>
+          <div className="messageHistory"><Chatbox messages={messageHistory} /></div>
+          <div className="form"><Textbox handleSubmit={handleSubmit}/></div>
       </div>
   )
 }
