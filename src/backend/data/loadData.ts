@@ -37,7 +37,7 @@ const createChunks = async () => {
                     const embeddingValue : string | undefined = await createEmbeddings(chunk);
 
                     if (embeddingValue) {
-                        embeddings.push({title: title, body: sectionContent, embedding: embeddingValue});
+                        embeddings.push({title: title, body: chunk, embedding: embeddingValue});
                     }
                 }
             }
@@ -84,3 +84,5 @@ const loadIntoDatabase = async () => {
         console.error(e);
     }
 }
+
+loadIntoDatabase();
