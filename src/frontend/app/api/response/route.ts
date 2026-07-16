@@ -39,28 +39,49 @@ const getResponse = async (userQuery: Record<string, string>) => {
         return {error: "No question present in request body", status: 400};
     }
 
+    console.time('embeddings');
     const userQueryEmbeddings = await createEmbeddings(userQuery.content);
+    console.timeEnd('embeddings');
 
     if (!userQueryEmbeddings) {
         return {error: "An error occurred creating embeddings for the user's query", status: 500};
     }
 
     // console.log(userQueryEmbeddings)
+    let chunkData;
+    let attempt = 1;
+    let success = false;
 
-    const { data } : {data : Chunk[] | null} = await supabase.rpc(
-        'get_relevant_chunks',
-        {
-            query_vector: userQueryEmbeddings,
-            match_threshold: 0.5,
-            match_count: 15
+    while (!success) {
+        console.log(`Attempt: ${attempt}`);
+        console.time('rpc');
+        const {data, error}: { data: Chunk[] | null, error: any } = await supabase.rpc(
+            'get_relevant_chunks',
+            {
+                query_vector: userQueryEmbeddings,
+                match_threshold: 0.5,
+                match_count: 15
+            }
+        )
+        console.timeEnd('rpc');
+
+        if (error && error.code == '57014' && attempt < 3) {
+            await new Promise(resolve => setTimeout(resolve, 2**(attempt - 1)*1000));
+            attempt++;
+        } else if (error && attempt == 3) {
+            return {error: "An error occurred retrieving relevant chunks from database.", status: 500};
+        } else if (!error) {
+            chunkData = data;
+            success = true;
         }
-    )
-
-    if (!data) {
-        return {error: "An error occurred retrieving relevant chunks from database.", status: 500}
     }
 
-    let cleanedData = data.map(chunk => chunk.body).join("\n\n---\n\n")
+    if (!chunkData) {
+        return {error: 'No chunks were retrieved from database.', status: 500}
+    }
+
+    // console.log(data);
+    let cleanedData = chunkData.map(chunk => `${chunk.title}: ${chunk.body}`).join("\n\n---\n\n")
 
     const response = await client.chat.completions.create({
         model: "gpt-5.4-mini",
@@ -94,7 +115,6 @@ export async function POST(request : NextRequest) {
             return NextResponse.json({error: response.error}, {status: response.status})
         }
     } catch (e) {
-        console.log(e);
         return NextResponse.json({error: "An error occurred in retrieving a response" + e}, {status: 500});
     }
 }
