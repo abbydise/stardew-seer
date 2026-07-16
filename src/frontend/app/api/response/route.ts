@@ -69,6 +69,7 @@ const getResponse = async (userQuery: Record<string, string>) => {
             await new Promise(resolve => setTimeout(resolve, 2**(attempt - 1)*1000));
             attempt++;
         } else if (error && attempt == 3) {
+            console.error(error);
             return {error: "An error occurred retrieving relevant chunks from database.", status: 500};
         } else if (!error) {
             chunkData = data;
