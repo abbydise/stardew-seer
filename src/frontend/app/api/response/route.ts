@@ -45,7 +45,7 @@ const getResponse = async (userQuery: Record<string, string>) => {
         return {error: "An error occurred creating embeddings for the user's query", status: 500};
     }
 
-    console.log(userQueryEmbeddings)
+    // console.log(userQueryEmbeddings)
 
     const { data } : {data : Chunk[] | null} = await supabase.rpc(
         'get_relevant_chunks',
