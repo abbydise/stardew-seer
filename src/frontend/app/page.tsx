@@ -1,7 +1,7 @@
 'use client'
 
-import Textbox from '../components/textbox';
-import Chatbox from '../components/chatbox';
+import Textbox from '../components/Textbox';
+import Chatbox from '../components/Chatbox';
 
 import { useState } from 'react';
 
