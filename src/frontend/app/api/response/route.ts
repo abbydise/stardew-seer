@@ -88,7 +88,7 @@ const getResponse = async (userQuery: Record<string, string>) => {
         model: "gpt-5.4-mini",
         messages: [{
             role: "system",
-            content: 'You are a Stardew Valley expert. Given the following chunks of information from the official Wiki page, answer the question using only that information. It must be outputted as plain text. If you are unsure and the answer is not explicitly written in the documentation, say "Sorry, I am unable to answer that. Please consult the official Stardew Valley Wiki at https://stardewvalleywiki.com/Stardew_Valley_Wiki."'
+            content: 'You are a Stardew Valley expert. You can only provide one of the 3 valid following responses outputted in plain text. You may not combine responses. Given the following chunks of information from the official Wiki page, provide the full answer using only that information. If you are unsure and the answer is not explicitly written in the documentation, say "Sorry, I am unable to answer that. Please consult the official Stardew Valley Wiki at https://stardewvalleywiki.com/Stardew_Valley_Wiki." In the case of the data not providing a complete answer, provide what information you do have and append "This information may not be whole. Please consult the official Stardew Valley Wiki at https://stardewvalleywiki.com/Stardew_Valley_Wiki." Make sure proper punctuation is used. In the case of a list, please delimit each entry with commas.'
         }, {role: "user", content: `Context: ${cleanedData}\n\nQuestion: ${userQuery.content}`}],
         max_completion_tokens: 512,
         temperature: 0,
